@@ -14,7 +14,8 @@ class HomeView extends GetView<HomeController> {
   // Function to get formatted date (only day and month)
   String getCurrentDate() {
     final now = DateTime.now();
-    final formattedDate = DateFormat('d MMMM').format(now); // Updated format
+    final formattedDate =
+        DateFormat('EEEE , d MMMM').format(now); // Updated format
     return formattedDate;
   }
 
@@ -65,7 +66,7 @@ class HomeView extends GetView<HomeController> {
                       return Text(
                         weatherController.location.value,
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 18,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -105,7 +106,7 @@ class HomeView extends GetView<HomeController> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'Today, ${getCurrentDate()}', // Updated date display
+                                getCurrentDate(), // Updated date display
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -113,21 +114,21 @@ class HomeView extends GetView<HomeController> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                '${weather.temperature}°',
+                                '${weather.temperature}°c',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 72,
+                                  fontSize: 58,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              const Text(
-                                'Cloudy',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                ),
-                              ),
+                              // const Text(
+                              //   'Cloudy',
+                              //   style: TextStyle(
+                              //     color: Colors.white,
+                              //     fontSize: 22,
+                              //   ),
+                              // ),
                               const SizedBox(height: 20),
                               Row(
                                 mainAxisAlignment:
@@ -180,10 +181,6 @@ class HomeView extends GetView<HomeController> {
                   onPressed: () {
                     // Navigate to weather details
                   },
-                  child: const Text(
-                    "Weather Details >",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-                  ),
                   style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 50, vertical: 20),
@@ -192,8 +189,12 @@ class HomeView extends GetView<HomeController> {
                       ),
                       backgroundColor: AppColors.buttonBackgroundColor,
                       foregroundColor: AppColors.buttonTextColor),
+                  child: const Text(
+                    "Weather Details  >",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                  ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 100),
               ],
             ),
           ),

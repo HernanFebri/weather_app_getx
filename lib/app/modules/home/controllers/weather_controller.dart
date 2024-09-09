@@ -2,12 +2,15 @@ import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geocoding/geocoding.dart'; // Import geocoding package
+import '../../../data/models/weather_model.dart';
+import '../../../services/api_services.dart'; // Adjust the import path as necessary
 
 class WeatherController extends GetxController {
   var isLoading = false.obs;
-  var weatherData = Rx<Weather>(Weather());
+  var weatherData =
+      WeatherModel(temperature: 0.0, windSpeed: 0.0, humidity: 0).obs;
   var errorMessage = ''.obs;
-  var location = ''.obs; // Update to store city name
+  var location = ''.obs; // Store city name
 
   @override
   void onInit() {
@@ -20,14 +23,20 @@ class WeatherController extends GetxController {
     errorMessage.value = '';
 
     try {
+      // Ambil posisi (latitude dan longitude)
       Position position = await _getCurrentLocation();
+
+      // Konversi latitude dan longitude menjadi nama kota
       String city =
           await _getCityFromPosition(position.latitude, position.longitude);
-      location.value = city; // Update location to city name
-      final response =
-          await fetchWeatherData(position.latitude, position.longitude);
-      weatherData.value = Weather.fromJson(response);
+      location.value = city; // Update nama lokasi dengan nama kota
+
+      // Ambil data cuaca berdasarkan lokasi
+      WeatherModel weather = await ApiService.fetchWeatherData();
+      weatherData.value = weather;
     } catch (e) {
+      // Log error dan tampilkan pesan error
+      print('Error fetching weather data: $e');
       errorMessage.value = 'Gagal mendapatkan data cuaca: $e';
     } finally {
       isLoading.value = false;
@@ -35,60 +44,35 @@ class WeatherController extends GetxController {
   }
 
   Future<Position> _getCurrentLocation() async {
+    // Minta izin lokasi
     PermissionStatus permissionStatus = await Permission.location.request();
     if (permissionStatus == PermissionStatus.granted) {
+      // Ambil lokasi jika izin diberikan
       return await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
     } else {
+      // Lempar exception jika izin ditolak
       throw Exception('Izin lokasi ditolak');
     }
   }
 
   Future<String> _getCityFromPosition(double latitude, double longitude) async {
     try {
+      // Ambil daftar placemarks berdasarkan latitude dan longitude
       List<Placemark> placemarks =
           await placemarkFromCoordinates(latitude, longitude);
+
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
-        print('Placemark: ${placemark.toJson()}'); // Tambahkan log untuk debug
+        print('Placemark: ${placemark.toJson()}'); // Debug log
+        // Return nama kota
         return placemark.locality ?? 'Tidak diketahui';
       } else {
         return 'Tidak diketahui';
       }
     } catch (e) {
-      print('Error: $e'); // Tambahkan log untuk debug
+      print('Error: $e'); // Debug log
       return 'Tidak diketahui';
     }
-  }
-
-  Future<Map<String, dynamic>> fetchWeatherData(
-      double latitude, double longitude) async {
-    // Implement the actual API call to fetch weather data here
-    // Example dummy response
-    return {
-      'temperature': 25.0,
-      'windSpeed': 10.0,
-      'humidity': 60,
-    };
-  }
-}
-
-class Weather {
-  final double temperature;
-  final double windSpeed;
-  final int humidity;
-
-  Weather({
-    this.temperature = 0.0,
-    this.windSpeed = 0.0,
-    this.humidity = 0,
-  });
-
-  factory Weather.fromJson(Map<String, dynamic> json) {
-    return Weather(
-      temperature: json['temperature'] ?? 0.0,
-      windSpeed: json['windSpeed'] ?? 0.0,
-      humidity: json['humidity'] ?? 0,
-    );
   }
 }

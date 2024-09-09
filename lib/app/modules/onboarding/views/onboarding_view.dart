@@ -76,11 +76,11 @@ class OnboardingView extends GetView<OnboardingController> {
                     child: const Text(
                       "Get Started",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                     ),
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 100, vertical: 20),
+                            horizontal: 50, vertical: 20),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
